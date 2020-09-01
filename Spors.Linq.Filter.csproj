@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <RootNamespace>Spors.Linq.Filter</RootNamespace>
+    <PackageId>Spors.Linq.Filter</PackageId>
+    <Authors>Leon Spors</Authors>
+    <Company>Spors</Company>
+    <Description>Library for generic linq filtering</Description>
+    <Copyright>Copyright (C) 2020 Spors</Copyright>
+    <AssemblyName>Spors.Linq.Filter</AssemblyName>
+    <PackageProjectUrl></PackageProjectUrl>
+    <RepositoryUrl>https://github.com/LeonSpors/Linq.Filter</RepositoryUrl>
+    <RepositoryType></RepositoryType>
+    <Product>Spors.Linq.Filter</Product>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageTags>Linq, Filter, Filtering</PackageTags>
+  </PropertyGroup>
+
+</Project>
