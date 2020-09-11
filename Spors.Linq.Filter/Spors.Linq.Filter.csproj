@@ -16,7 +16,6 @@
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageTags>Linq, Filter, Filtering</PackageTags>
     <Version>1.0.1</Version>
-    <LangVersion>preview</LangVersion>
   </PropertyGroup>
 
 </Project>

@@ -32,8 +32,8 @@ namespace Spors.Linq
         /// </summary>
         public Filter()
         {
-            _activeFilters = new();
-            _combinedFilters = new();
+            _activeFilters = new List<Tuple<string, string, Expression<Func<T, bool>>>>();
+            _combinedFilters = new Dictionary<string, Expression<Func<T, bool>>>();
         }
 
         /// <summary>
@@ -44,7 +44,7 @@ namespace Spors.Linq
         {
             if (filter != null)
             {
-                Func<T, bool> f = new(filter);
+                Func<T, bool> f = new Func<T, bool>(filter);
                 Expression<Func<T, bool>> expression = x => f(x);
 
                 if (string.IsNullOrEmpty(key))
@@ -74,7 +74,7 @@ namespace Spors.Linq
 
             if (filter != null)
             {
-                Func<T, bool> f = new(filter);
+                Func<T, bool> f = new Func<T, bool>(filter);
                 Expression<Func<T, bool>> expression = x => f(x);
                 int filtersRemoved = _activeFilters.RemoveAll(x => x.Item3 == expression);
 
@@ -152,7 +152,7 @@ namespace Spors.Linq
                             )
                         , p);
 
-                    currentExpression = new(currentExpression.Key, expression);
+                    currentExpression = new KeyValuePair<string, Expression<Func<T, bool>>>(currentExpression.Key, expression);
                 }
                 else
                     _combinedFilters.Add(filter.Item2, filter.Item3);
