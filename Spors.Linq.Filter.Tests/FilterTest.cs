@@ -11,7 +11,7 @@ namespace Spors.Linq.Filter.Tests
         [TestMethod]
         public void AddFilter_AnonymousFilter_FilterCountEqualsOne()
         {
-            Filter<int> filter = new();
+            Filter<int> filter = new Filter<int>();
 
             Predicate<int> predicate = val => val > 0;
             filter.AddFilter(predicate);
@@ -22,7 +22,7 @@ namespace Spors.Linq.Filter.Tests
         [TestMethod]
         public void Remove_PredicateExists_ReturnsTrue()
         {
-            Filter<int> filter = new();
+            Filter<int> filter = new Filter<int>();
 
             Predicate<int> predicate = val => val > 0;
             filter.AddFilter(predicate);
@@ -34,7 +34,7 @@ namespace Spors.Linq.Filter.Tests
         [TestMethod]
         public void Remove_PredicateDoesNotExists_ReturnsFalse()
         {
-            Filter<int> filter = new();
+            Filter<int> filter = new Filter<int>();
 
             Predicate<int> predicate = val => val > 0;
             Predicate<int> differentPredicate = val => val > 100;
@@ -47,7 +47,7 @@ namespace Spors.Linq.Filter.Tests
         [TestMethod]
         public void Remove_KeyExists_ReturnsTrue()
         {
-            Filter<int> filter = new();
+            Filter<int> filter = new Filter<int>();
 
             Predicate<int> predicate = val => val > 0;
             filter.AddFilter(predicate, "test");
@@ -59,7 +59,7 @@ namespace Spors.Linq.Filter.Tests
         [TestMethod]
         public void Remove_KeyDoesNotExists_ReturnsFalse()
         {
-            Filter<int> filter = new();
+            Filter<int> filter = new Filter<int>();
 
             Predicate<int> predicate = val => val > 0;
             filter.AddFilter(predicate, "test");
@@ -71,7 +71,7 @@ namespace Spors.Linq.Filter.Tests
         [TestMethod]
         public void RemoveByGroup_GroupExists_ReturnsTrue()
         {
-            Filter<int> filter = new();
+            Filter<int> filter = new Filter<int>();
 
             Predicate<int> predicate = val => val > 0;
             filter.AddFilter(predicate, group: "test");
@@ -83,7 +83,7 @@ namespace Spors.Linq.Filter.Tests
         [TestMethod]
         public void RemoveByGroup_GroupDoesNotExists_ReturnsFalse()
         {
-            Filter<int> filter = new();
+            Filter<int> filter = new Filter<int>();
 
             Predicate<int> predicate = val => val > 0;
             filter.AddFilter(predicate, group: "test");
@@ -95,9 +95,9 @@ namespace Spors.Linq.Filter.Tests
         [TestMethod]
         public void ApplyFilter_EmptyFilterList_ReturnsEmptyList()
         {
-            Filter<int> filter = new();
+            Filter<int> filter = new Filter<int>();
 
-            List<int> numbers = new() { 0, 1, 3, 4 };
+            List<int> numbers = new List<int>() { 0, 1, 3, 4 };
             List<int> resultList = (List<int>) filter.ApplyFilters(numbers);
 
             Assert.IsTrue(resultList.Count == 0);
@@ -106,12 +106,12 @@ namespace Spors.Linq.Filter.Tests
         [TestMethod]
         public void ApplyFilter_OneFilter_ReturnListCountTwo()
         {
-            Filter<int> filter = new();
+            Filter<int> filter = new Filter<int>();
 
             Predicate<int> predicate = val => val > 2;
             filter.AddFilter(predicate);
 
-            List<int> numbers = new() { 0, 1, 3, 4 };
+            List<int> numbers = new List<int>() { 0, 1, 3, 4 };
             List<int> resultList = (List<int>) filter.ApplyFilters(numbers);
 
             Assert.IsTrue(resultList.Count == 2);
@@ -120,7 +120,7 @@ namespace Spors.Linq.Filter.Tests
         [TestMethod]
         public void ApplyFilter_MultipleFilter_ReturnListCountTwo()
         {
-            Filter<int> filter = new();
+            Filter<int> filter = new Filter<int>();
 
             Predicate<int> predicate = val => val > 10;
             Predicate<int> anotherPredicate = val => val == 17;
@@ -128,7 +128,7 @@ namespace Spors.Linq.Filter.Tests
             filter.AddFilter(predicate);
             filter.AddFilter(anotherPredicate);
 
-            List<int> numbers = new() { 0, 1, 3, 4, 9, 5, 17 };
+            List<int> numbers = new List<int>() { 0, 1, 3, 4, 9, 5, 17 };
             List<int> resultList = (List<int>) filter.ApplyFilters(numbers);
 
             Assert.IsTrue(resultList.Count == 1);
@@ -137,7 +137,7 @@ namespace Spors.Linq.Filter.Tests
         [TestMethod]
         public void ApplyFilter_OrFilter_ReturnListCountOne()
         {
-            Filter<int> filter = new();
+            Filter<int> filter = new Filter<int>();
 
             Predicate<int> isGreaterThanSeven = val => val > 7;
             Predicate<int> isSmallerThanTen = val => val < 10;
@@ -145,7 +145,7 @@ namespace Spors.Linq.Filter.Tests
             filter.AddFilter(isGreaterThanSeven, group: "test");
             filter.AddFilter(isSmallerThanTen, group: "test");
 
-            List<int> numbers = new() { 0, 1, 3, 4, 9, 5, 17 };
+            List<int> numbers = new List<int>() { 0, 1, 3, 4, 9, 5, 17 };
             List<int> resultList = (List<int>) filter.ApplyFilters(numbers);
 
             Assert.IsTrue(resultList.Count == 1);
