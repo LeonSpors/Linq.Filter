@@ -124,13 +124,6 @@ namespace Spors.Linq
         }
 
         /// <summary>
-        /// Removes an active filter at index.
-        /// </summary>
-        /// <param name="index">List index of the filter tuple.</param>
-        public void RemoveAt(int index)
-            => _activeFilters.RemoveAt(index);
-
-        /// <summary>
         /// Removes all active filters.
         /// </summary>
         public void Reset()
