@@ -12,6 +12,11 @@ namespace Spors.Linq
     /// <typeparam name="T">Input type of the <see cref="Enumerable"/></typeparam>
     public class Filter<T>
     {
+        public int Count
+        {
+            get => _activeFilters.Count;
+        }
+
         /// <summary>
         /// Actual list that holds a filter by key and group.
         /// </summary>
@@ -37,7 +42,7 @@ namespace Spors.Linq
         /// <param name="filter"></param>
         public void AddFilter(Predicate<T> filter, string key = "", string group = "")
         {
-            if(filter != null)
+            if (filter != null)
             {
                 Func<T, bool> f = new(filter);
                 Expression<Func<T, bool>> expression = x => f(x);
@@ -63,36 +68,60 @@ namespace Spors.Linq
         /// Removes an actual active filter.
         /// </summary>
         /// <param name="filter"><see cref="Predicate{T}"/></param>
-        public void Remove(Predicate<T> filter)
+        public bool Remove(Predicate<T> filter)
         {
+            bool result = false;
+
             if (filter != null)
             {
                 Func<T, bool> f = new(filter);
                 Expression<Func<T, bool>> expression = x => f(x);
-                _activeFilters.RemoveAll(x => x.Item3 == expression);
+                int filtersRemoved = _activeFilters.RemoveAll(x => x.Item3 == expression);
+
+                if (filtersRemoved > 0)
+                    result = true;
             }
+
+            return result;
         }
 
         /// <summary>
         /// Removes an actual active filter by key.
         /// </summary>
         /// <param name="key">Key that represents the value.</param>
-        public void Remove(string key)
-            => _activeFilters.RemoveAll(x => x.Item1 == key);
+        public bool Remove(string key)
+        {
+            bool result = false;
+
+            if (string.IsNullOrEmpty(key))
+            {
+                int filtersRemoved = _activeFilters.RemoveAll(x => x.Item1 == key);
+
+                if (filtersRemoved > 0)
+                    result = true;
+            }
+
+            return result;
+        }
 
         /// <summary>
         /// Removes an actual active filter by group.
         /// </summary>
         /// <param name="key">Key that represents the value.</param>
-        public void RemoveGroup(string group)
-            => _activeFilters.RemoveAll(x => x.Item2 == group);
+        public bool RemoveByGroup(string group)
+        {
+            bool result = false;
 
-        /// <summary>
-        /// Removes an active filter at index.
-        /// </summary>
-        /// <param name="index">List index of the filter tuple.</param>
-        public void RemoveAt(int index)
-            => _activeFilters.RemoveAt(index);
+            if (string.IsNullOrEmpty(group))
+            {
+                int filtersRemoved = _activeFilters.RemoveAll(x => x.Item2 == group);
+
+                if (filtersRemoved > 0)
+                    result = true;
+            }
+
+            return result;
+        }
 
         /// <summary>
         /// Removes all active filters.
@@ -115,7 +144,7 @@ namespace Spors.Linq
                 if ((currentExpression.Key, currentExpression.Value) != default)
                 {
                     var p = Expression.Parameter(typeof(T));
-                    Expression<Func<T, bool>> expression = (Expression<Func<T, bool>>) 
+                    Expression<Func<T, bool>> expression = (Expression<Func<T, bool>>)
                         Expression.Lambda(
                             Expression.OrElse(
                                 Expression.Invoke(currentExpression.Value, p),
