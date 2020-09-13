@@ -20,37 +20,12 @@ namespace Spors.Linq.Filter.Tests
         }
 
         [TestMethod]
-        public void Remove_PredicateExists_ReturnsTrue()
-        {
-            Filter<int> filter = new Filter<int>();
-
-            Predicate<int> predicate = val => val > 0;
-            filter.AddFilter(predicate);
-            bool result = filter.Remove(predicate);
-
-            Assert.IsTrue(result);
-        }
-
-        [TestMethod]
-        public void Remove_PredicateDoesNotExists_ReturnsFalse()
-        {
-            Filter<int> filter = new Filter<int>();
-
-            Predicate<int> predicate = val => val > 0;
-            Predicate<int> differentPredicate = val => val > 100;
-            filter.AddFilter(predicate);
-            bool result = filter.Remove(differentPredicate);
-
-            Assert.IsFalse(result);
-        }
-
-        [TestMethod]
         public void Remove_KeyExists_ReturnsTrue()
         {
             Filter<int> filter = new Filter<int>();
 
             Predicate<int> predicate = val => val > 0;
-            filter.AddFilter(predicate, "test");
+            filter.AddFilter(predicate, key: "test");
             bool result = filter.Remove("test");
 
             Assert.IsTrue(result);
@@ -148,7 +123,7 @@ namespace Spors.Linq.Filter.Tests
             List<int> numbers = new List<int>() { 0, 1, 3, 4, 9, 5, 17 };
             List<int> resultList = (List<int>) filter.ApplyFilters(numbers);
 
-            Assert.IsTrue(resultList.Count == 1);
+            Assert.IsTrue(resultList.Count == 2);
         }
     }
 }

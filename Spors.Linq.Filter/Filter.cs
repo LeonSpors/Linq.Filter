@@ -12,18 +12,21 @@ namespace Spors.Linq
     /// <typeparam name="T">Input type of the <see cref="Enumerable"/></typeparam>
     public class Filter<T>
     {
+        /// <summary>
+        /// Returns the count of active filters.
+        /// </summary>
         public int Count
         {
             get => _activeFilters.Count;
         }
 
         /// <summary>
-        /// Actual list that holds a filter by key and group.
+        /// List that holds a filter by key and group.
         /// </summary>
         private readonly List<Tuple<string, string, Expression<Func<T, bool>>>> _activeFilters;
 
         /// <summary>
-        /// List of all combined 
+        /// List of all combined filters.
         /// </summary>
         private readonly Dictionary<string, Expression<Func<T, bool>>> _combinedFilters;
 
@@ -50,50 +53,21 @@ namespace Spors.Linq
                 if (string.IsNullOrEmpty(key))
                     key = StringHelper.RandomString(6);
                 if (string.IsNullOrEmpty(group))
-                    key = StringHelper.RandomString(6);
+                    group = StringHelper.RandomString(6);
+
                 _activeFilters.Add(Tuple.Create(key, group, expression));
             }
         }
 
-        //public void AddOrUpdateAndFilter(string key, Predicate<T> filter)
-        //{
-        //    var filterToBeUpdated = _activeFilters.FirstOrDefault(x => x.Item1 == key);
-        //    if (filterToBeUpdated != null)
-        //        filterToBeUpdated.Item2 = Predicate.And(filterToBeUpdated.Item2, filter);
-        //    else
-        //        AddFilter(filter, key);
-        //}
-
         /// <summary>
-        /// Removes an actual active filter.
-        /// </summary>
-        /// <param name="filter"><see cref="Predicate{T}"/></param>
-        public bool Remove(Predicate<T> filter)
-        {
-            bool result = false;
-
-            if (filter != null)
-            {
-                Func<T, bool> f = new Func<T, bool>(filter);
-                Expression<Func<T, bool>> expression = x => f(x);
-                int filtersRemoved = _activeFilters.RemoveAll(x => x.Item3 == expression);
-
-                if (filtersRemoved > 0)
-                    result = true;
-            }
-
-            return result;
-        }
-
-        /// <summary>
-        /// Removes an actual active filter by key.
+        /// Removes an active filter by key.
         /// </summary>
         /// <param name="key">Key that represents the value.</param>
         public bool Remove(string key)
         {
             bool result = false;
 
-            if (string.IsNullOrEmpty(key))
+            if (!string.IsNullOrEmpty(key))
             {
                 int filtersRemoved = _activeFilters.RemoveAll(x => x.Item1 == key);
 
@@ -112,7 +86,7 @@ namespace Spors.Linq
         {
             bool result = false;
 
-            if (string.IsNullOrEmpty(group))
+            if (!string.IsNullOrEmpty(group))
             {
                 int filtersRemoved = _activeFilters.RemoveAll(x => x.Item2 == group);
 
