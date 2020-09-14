@@ -15,7 +15,7 @@
     <Product>Spors.Linq.Filter</Product>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageTags>Linq, Filter, Filtering</PackageTags>
-    <Version>1.0.1</Version>
+    <Version>1.1.1</Version>
   </PropertyGroup>
 
 </Project>
