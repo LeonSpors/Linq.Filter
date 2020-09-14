@@ -26,17 +26,11 @@ namespace Spors.Linq
         private readonly List<Tuple<string, string, Expression<Func<T, bool>>>> _activeFilters;
 
         /// <summary>
-        /// List of all combined filters.
-        /// </summary>
-        private readonly Dictionary<string, Expression<Func<T, bool>>> _combinedFilters;
-
-        /// <summary>
         /// Constructor
         /// </summary>
         public Filter()
         {
             _activeFilters = new List<Tuple<string, string, Expression<Func<T, bool>>>>();
-            _combinedFilters = new Dictionary<string, Expression<Func<T, bool>>>();
         }
 
         /// <summary>
@@ -79,7 +73,7 @@ namespace Spors.Linq
         }
 
         /// <summary>
-        /// Removes an actual active filter by group.
+        /// Removes an active filter by group.
         /// </summary>
         /// <param name="key">Key that represents the value.</param>
         public bool RemoveByGroup(string group)
@@ -107,44 +101,58 @@ namespace Spors.Linq
         /// Applies all filters to the given <see cref="Enumerable"/>.
         /// </summary>
         /// <param name="currentList">The list on which all filters should be applied.</param>
-        /// <returns></returns>
+        /// <returns>A filtered list</returns>
         public IEnumerable<T> ApplyFilters(IEnumerable<T> currentList)
         {
-            _combinedFilters.Clear();
+            Dictionary<string, Expression<Func<T, bool>>> groupedFilter = new Dictionary<string, Expression<Func<T, bool>>>();
             foreach (var filter in _activeFilters)
             {
-                var currentExpression = _combinedFilters.FirstOrDefault(x => x.Key == filter.Item2);
-
-                if ((currentExpression.Key, currentExpression.Value) != default)
+                if(groupedFilter.TryGetValue(filter.Item2, out Expression<Func<T, bool>> currentExpression))
                 {
-                    var p = Expression.Parameter(typeof(T));
+                    var parameter = Expression.Parameter(typeof(T));
                     Expression<Func<T, bool>> expression = (Expression<Func<T, bool>>)
                         Expression.Lambda(
                             Expression.OrElse(
-                                Expression.Invoke(currentExpression.Value, p),
-                                Expression.Invoke(filter.Item3, p)
-                            )
-                        , p);
+                                Expression.Invoke(currentExpression, parameter),
+                                Expression.Invoke(filter.Item3, parameter)
+                            ), parameter);
 
-                    currentExpression = new KeyValuePair<string, Expression<Func<T, bool>>>(currentExpression.Key, expression);
+                    groupedFilter[filter.Item2] = expression;
                 }
                 else
-                    _combinedFilters.Add(filter.Item2, filter.Item3);
+                {
+                    groupedFilter.Add(filter.Item2, filter.Item3);
+                }
             }
 
-            IEnumerable<T> temporaryList = Enumerable.Empty<T>();
-            foreach (var filter in _combinedFilters)
+            Expression<Func<T, bool>> combinedExpression = null;
+            foreach (var filter in groupedFilter)
             {
-                Func<T, bool> predicate = filter.Value.Compile();
-                var filterResult = currentList.Where(predicate);
+                if(combinedExpression != null)
+                {
+                    var parameter = Expression.Parameter(typeof(T));
+                    Expression<Func<T, bool>> expression = (Expression<Func<T, bool>>)
+                        Expression.Lambda(
+                            Expression.AndAlso(
+                                Expression.Invoke(combinedExpression, parameter),
+                                Expression.Invoke(filter.Value, parameter)
+                            ), parameter);
 
-                if (temporaryList.Count() > 0)
-                    temporaryList = temporaryList.Intersect(filterResult);
+                    combinedExpression = expression;
+                }
                 else
-                    temporaryList = filterResult;
+                {
+                    combinedExpression = filter.Value;
+                }
             }
 
-            return temporaryList.ToList();
+            if(currentList.Count() > 0)
+            {
+                Func<T, bool> predicate = combinedExpression.Compile();
+                return currentList.Where(predicate);
+            }
+
+            return Enumerable.Empty<T>();
         }
     }
 }
