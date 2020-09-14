@@ -73,7 +73,7 @@ namespace Spors.Linq.Filter.Tests
             Filter<int> filter = new Filter<int>();
 
             List<int> numbers = new List<int>() { 0, 1, 3, 4 };
-            List<int> resultList = (List<int>) filter.ApplyFilters(numbers);
+            List<int> resultList = filter.ApplyFilters(numbers).ToList();
 
             Assert.IsTrue(resultList.Count == 0);
         }
@@ -87,7 +87,7 @@ namespace Spors.Linq.Filter.Tests
             filter.AddFilter(predicate);
 
             List<int> numbers = new List<int>() { 0, 1, 3, 4 };
-            List<int> resultList = (List<int>) filter.ApplyFilters(numbers);
+            List<int> resultList = filter.ApplyFilters(numbers).ToList();
 
             Assert.IsTrue(resultList.Count == 2);
         }
@@ -104,26 +104,26 @@ namespace Spors.Linq.Filter.Tests
             filter.AddFilter(anotherPredicate);
 
             List<int> numbers = new List<int>() { 0, 1, 3, 4, 9, 5, 17 };
-            List<int> resultList = (List<int>) filter.ApplyFilters(numbers);
+            List<int> resultList = filter.ApplyFilters(numbers).ToList();
 
             Assert.IsTrue(resultList.Count == 1);
         }
 
         [TestMethod]
-        public void ApplyFilter_OrFilter_ReturnListCountOne()
+        public void ApplyFilter_OrElseFilter_ReturnListCountOne()
         {
             Filter<int> filter = new Filter<int>();
 
             Predicate<int> isGreaterThanSeven = val => val > 7;
             Predicate<int> isSmallerThanTen = val => val < 10;
 
-            filter.AddFilter(isGreaterThanSeven, group: "test");
-            filter.AddFilter(isSmallerThanTen, group: "test");
+            filter.AddFilter(isGreaterThanSeven);
+            filter.AddFilter(isSmallerThanTen);
 
             List<int> numbers = new List<int>() { 0, 1, 3, 4, 9, 5, 17 };
-            List<int> resultList = (List<int>) filter.ApplyFilters(numbers);
+            List<int> resultList = filter.ApplyFilters(numbers).ToList();
 
-            Assert.IsTrue(resultList.Count == 2);
+            Assert.IsTrue(resultList.Count == 1);
         }
     }
 }
