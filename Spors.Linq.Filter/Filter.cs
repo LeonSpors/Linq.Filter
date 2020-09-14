@@ -105,48 +105,52 @@ namespace Spors.Linq
         public IEnumerable<T> ApplyFilters(IEnumerable<T> currentList)
         {
             Dictionary<string, Expression<Func<T, bool>>> groupedFilter = new Dictionary<string, Expression<Func<T, bool>>>();
-            foreach (var filter in _activeFilters)
+            Expression<Func<T, bool>> combinedExpression = null;
+
+            if (_activeFilters.Count > 0)
             {
-                if(groupedFilter.TryGetValue(filter.Item2, out Expression<Func<T, bool>> currentExpression))
+                foreach (var filter in _activeFilters)
                 {
-                    var parameter = Expression.Parameter(typeof(T));
-                    Expression<Func<T, bool>> expression = (Expression<Func<T, bool>>)
+                    if (groupedFilter.TryGetValue(filter.Item2, out Expression<Func<T, bool>> currentExpression))
+                    {
+                        var parameter = Expression.Parameter(typeof(T));
+                        Expression<Func<T, bool>> expression = (Expression<Func<T, bool>>)
                         Expression.Lambda(
                             Expression.OrElse(
                                 Expression.Invoke(currentExpression, parameter),
                                 Expression.Invoke(filter.Item3, parameter)
                             ), parameter);
 
-                    groupedFilter[filter.Item2] = expression;
+                        groupedFilter[filter.Item2] = expression;
+                    }
+                    else
+                    {
+                        groupedFilter.Add(filter.Item2, filter.Item3);
+                    }
                 }
-                else
-                {
-                    groupedFilter.Add(filter.Item2, filter.Item3);
-                }
-            }
 
-            Expression<Func<T, bool>> combinedExpression = null;
-            foreach (var filter in groupedFilter)
-            {
-                if(combinedExpression != null)
+                foreach (var filter in groupedFilter)
                 {
-                    var parameter = Expression.Parameter(typeof(T));
-                    Expression<Func<T, bool>> expression = (Expression<Func<T, bool>>)
+                    if (combinedExpression != null)
+                    {
+                        var parameter = Expression.Parameter(typeof(T));
+                        Expression<Func<T, bool>> expression = (Expression<Func<T, bool>>)
                         Expression.Lambda(
                             Expression.AndAlso(
                                 Expression.Invoke(combinedExpression, parameter),
                                 Expression.Invoke(filter.Value, parameter)
                             ), parameter);
 
-                    combinedExpression = expression;
-                }
-                else
-                {
-                    combinedExpression = filter.Value;
+                        combinedExpression = expression;
+                    }
+                    else
+                    {
+                        combinedExpression = filter.Value;
+                    }
                 }
             }
 
-            if(currentList.Count() > 0)
+            if(currentList.Count() > 0 && _activeFilters.Count > 0)
             {
                 Func<T, bool> predicate = combinedExpression.Compile();
                 return currentList.Where(predicate);
