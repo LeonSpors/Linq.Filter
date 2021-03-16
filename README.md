@@ -7,7 +7,7 @@
 ![codecov](https://codecov.io/gh/LeonSpors/Linq.Filter/branch/master/graph/badge.svg)
 ![GitHub](https://img.shields.io/github/license/LeonSpors/Linq.Filter?style=flat-square)
 
-## An universal library for filtering list
+## An universal library for filtering a list
 Spors.Linq.Filter is a .NET library for managing linq filtering of an IEnumerable source. See [documentation](docs/README.md).
 
 ## Getting Started
